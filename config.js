@@ -58,7 +58,7 @@ let config = {
     pages: [
         {
             title: 'hello world',
-            template: 'templates/base.html',
+            template: 'templates/index.html',
             filename: 'index.html',
             chunks: ['app', 'lib'],
             minify: true
