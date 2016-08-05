@@ -32,9 +32,6 @@ const SRC_PATH = path.join(__dirname, 'src');
 //发布目录所在位置
 const BUILD_PATH = path.join(__dirname, 'build');
 
-//源码中的html模版所在位置
-const TEMPLATE_PATH = path.join(SRC_PATH, 'templates');
-
 //html压缩选项
 const minfyHtmlOptions = {
     collapseWhitespace: true, //删除空格
@@ -51,7 +48,7 @@ function createPage(options) {
         title: 'undefined title',
         inject: 'body'
     }, options || {});
-    if (o.template) o.template = path.join(TEMPLATE_PATH, o.template);
+    if (o.template) o.template = path.join(SRC_PATH, o.template);
     if (o.minify) o.minify = minfyHtmlOptions;
     return new HtmlPlugin(o);
 }
@@ -61,7 +58,7 @@ let config = {
     pages: [
         {
             title: 'hello world',
-            template: 'index.html',
+            template: 'templates/base.html',
             filename: 'index.html',
             chunks: ['app', 'lib'],
             minify: true
@@ -69,11 +66,11 @@ let config = {
     ],
     entry: {
         app: path.join(SRC_PATH, 'app.js'),
-        lib: ['react', 'react-dom']
+        lib: ['react', 'react-dom', 'react-router']
     },
     output: {
         path: BUILD_PATH,
-        // publicPath: '/',
+        publicPath: '/',
         filename: 'assets/[name].[hash:8].js'
     },
     resolve: {
