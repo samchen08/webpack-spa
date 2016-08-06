@@ -26,16 +26,27 @@ let TextPlugin = require('extract-text-webpack-plugin');
  */
 let HtmlPlugin = require('html-webpack-plugin');
 
+var SpritesmithPlugin = require('webpack-spritesmith');
+
+
 //源码所在目录位置
 const SRC_PATH = path.join(__dirname, 'src');
 
 //发布目录所在位置
 const BUILD_PATH = path.join(__dirname, 'build');
 
+// 使用缓存
+const CACHE_PATH = path.join(__dirname, 'cache');
+
 //html压缩选项
 const minfyHtmlOptions = {
-    collapseWhitespace: true, //删除空格
-    removeComments: true //删除注释
+    collapseWhitespace: true,
+    collapseInlineTagWhitespace: true,
+    removeRedundantAttributes: true,
+    removeEmptyAttributes: true,
+    removeScriptTypeAttributes: true,
+    removeStyleLinkTypeAttributes: true,
+    removeComments: true
 };
 
 /**
@@ -58,7 +69,7 @@ let config = {
     pages: [
         {
             title: 'hello world',
-            template: 'templates/index.html',
+            template: 'templates/base.html',
             filename: 'index.html',
             chunks: ['app', 'lib'],
             minify: true
@@ -81,7 +92,24 @@ let config = {
         new webpack.optimize.CommonsChunkPlugin('lib', 'assets/lib.[hash:8].js'),
         new BowerWebpackPlugin({
             searchResolveModulesDirectories: false
+        }),
+        new SpritesmithPlugin({
+            src: {
+                cwd: './src/images/icon',
+                glob: '*.png'
+            },
+            target: {
+                image: './src/images/sprite/icon.png',
+                css: './src/sass/_icon.scss'
+            },
+            apiOptions: {
+                cssImageRef: '../images/sprite/icon.png'
+            },
+            spritesmithOptions: {
+                algorithm: 'top-down'
+            }
         })
+
     ],
     eslint: {
         configFile: '.eslintrc'
@@ -95,19 +123,20 @@ let config = {
     ],
     loaders: [
         {
-            test: /\.(css|scss)$/,
-            //单独打包css文件用
-            loader: TextPlugin.extract('style-loader', 'css-loader', 'sass-loader')
+            test: /\.(css|scss)/,
+            loader: TextPlugin.extract('style-loader', 'css-loader!sass')
         },
+
         {
             test: /\.(jpg|png|gif)$/,
-            loader: 'url-loader?limit=10240&name=assets/[name].[hash].[ext]'
+            loaders: ['url-loader?limit=10240&name=assets/[name].[hash:8].[ext]', 'image-webpack']
         },
         {
             test: /\.(js|jsx)$/,
             loader: 'babel',
             exclude: /node_modules/,
             query: {
+                cacheDirectory: CACHE_PATH,
                 presets: ['react', 'es2015']
             }
         },
@@ -120,6 +149,9 @@ let config = {
             loader: 'json-loader'
         }
     ],
+    sassLoader: {
+        sourceComments: true
+    },
     devServer: {
         historyApiFallback: true,
         hot: true,
@@ -134,6 +166,7 @@ let config = {
              */
         }
     }
+
 
 };
 

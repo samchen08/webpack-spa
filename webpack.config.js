@@ -7,6 +7,7 @@ let webpack = require('webpack');
 
 let webPackConfig = require('./config');
 
+
 /**
  * 获取命令行参数数数组
  * 关于minimist模块说明请参考：https://github.com/substack/minimist
@@ -99,6 +100,7 @@ function createConfig(curEnv) {
                 ]
             };
             break;
+
     }
 
     delete config.preLoaders;
